@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Watch Party - Stream en Vivo</title>
+    <title>Watch Party - Stream & Pantalla</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -17,37 +17,53 @@
         }
         header {
             background-color: #18181b;
-            padding: 12px 20px;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #2d2d30;
+            height: 50px;
         }
-        header h1 { font-size: 18px; color: #00ff7f; }
+        header h1 { font-size: 16px; color: #00ff7f; }
         .config-btn {
             background: #53fc18;
             color: #000;
             border: none;
-            padding: 6px 12px;
+            padding: 5px 10px;
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
+            font-size: 12px;
         }
         .main-container {
             display: flex;
             flex: 1;
+            height: calc(100vh - 50px);
             overflow: hidden;
         }
+        
+        /* Panel Izquierdo: Tu cámara / Stream principal de Kick */
         .left-panel {
-            width: 26%;
+            width: 25%;
             background-color: #1f1f23;
             display: flex;
             flex-direction: column;
             border-right: 2px solid #2d2d30;
         }
-        .stream-box { height: 40%; background: #000; }
-        .chat-info { flex: 1; padding: 15px; font-size: 14px; color: #adadb8; }
+        .stream-box { 
+            height: 45%; 
+            background: #000; 
+            border-bottom: 2px solid #2d2d30;
+        }
+        .chat-info { 
+            flex: 1; 
+            padding: 15px; 
+            font-size: 13px; 
+            color: #adadb8; 
+            overflow-y: auto;
+        }
         
+        /* Panel Central: La pantalla compartida (Stremio / Netflix / PC) */
         .center-panel {
             flex: 1;
             background-color: #000;
@@ -56,11 +72,16 @@
             align-items: center;
             position: relative;
         }
+        
+        /* Panel Derecho: Chat en vivo de Kick ocupando toda la altura */
         .right-panel {
             width: 22%;
             background-color: #18181b;
             border-left: 2px solid #2d2d30;
+            display: flex;
+            flex-direction: column;
         }
+
         iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
@@ -68,34 +89,37 @@
 
     <header>
         <h1 id="titulo-sala">Watch Party en Vivo</h1>
-        <button class="config-btn" onclick="cambiarConfig()">Cambiar Canales</button>
+        <button class="config-btn" onclick="cambiarConfig()">Cambiar Canal / Sala</button>
     </header>
 
     <div class="main-container">
-        <!-- Panel Izquierdo: Tu stream de Kick -->
+        
+        <!-- 1. Panel Izquierdo: Tu transmisión de Kick (audio/cámara) -->
         <div class="left-panel">
             <div class="stream-box">
                 <iframe id="frame-stream" allowfullscreen="true"></iframe>
             </div>
             <div class="chat-info">
-                <p>💡 <b>Nota:</b> Aquí se proyecta la pantalla de la app (Stremio/Netflix) en tiempo real para que tu comunidad la vea sin que Kick te detecte copyright.</p>
+                <p>💡 <b>Cómo usar:</b></p><br>
+                <p>1. Entra a tu sala de video y comparte la ventana de Stremio o Netflix en el centro.</p><br>
+                <p>2. Abre tu directo en Kick hablando con la gente, <b>sin mostrar la película</b> en Kick.</p>
             </div>
         </div>
 
-        <!-- Panel Central: Pantalla compartida en tiempo real -->
+        <!-- 2. Panel Central: La película en tiempo real (Stremio / Pantalla) -->
         <div class="center-panel">
-            <!-- Usamos un iframe dinámico para la fuente de video en vivo o pantalla compartida -->
             <iframe id="frame-pantalla" allow="camera; microphone; display-capture; fullscreen"></iframe>
         </div>
 
-        <!-- Panel Derecho: Chat de Kick -->
+        <!-- 3. Panel Derecho: El Chat en vivo de Kick abarcando todo el alto -->
         <div class="right-panel">
             <iframe id="frame-chat" scrolling="no"></iframe>
         </div>
+
     </div>
 
     <script>
-        // Parámetros de la URL: ?user=TuKick&room=IdDeSalaEnVivo
+        // Parámetros automáticos por URL (Ej: tudominio.com/?user=TuCanal&room=sala123)
         const params = new URLSearchParams(window.location.search);
         let user = params.get('user');
         let room = params.get('room');
@@ -104,21 +128,21 @@
             user = prompt("Ingresa tu usuario de Kick:") || "tu_usuario";
         }
         if (!room) {
-            room = prompt("Ingresa el identificador de tu sala de transmisión (ej: sala-secreta-123):") || "sala-default";
+            room = prompt("Ingresa el identificador secreto de la sala de video:") || "sala-default";
         }
 
-        // Configurar elementos visuales
-        document.getElementById("titulo-sala").innerText = "Sala de: " + user;
+        // Asignar rutas a los iframes
+        document.getElementById("titulo-sala").innerText = "Sala de Watch Party: " + user;
         document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
         document.getElementById("frame-chat").src = `https://kick.com/${user}/chatroom`;
         
-        // Aquí conectamos el panel central a una plataforma de WebRTC libre o servicio de iframe en vivo (Ej: Jitsi Meet incrustado u otro servicio de mirror)
-        // Puedes usar un servicio gratuito de salas de video open source cambiando esta URL base:
+        // Panel central de video compartido en tiempo real
         document.getElementById("frame-pantalla").src = `https://meet.jit.si/${room}#config.startWithAudioMuted=true&config.startWithVideoMuted=true&interfaceConfig.TOOLBAR_BUTTONS=['microphone','camera','desktop','fullscreen']`;
 
+        // Función para cambiar de usuario o sala rápidamente desde el botón
         function cambiarConfig() {
-            let nuevoUser = prompt("Usuario de Kick:", user);
-            let nuevaSala = prompt("ID de la sala en vivo:", room);
+            let nuevoUser = prompt("Nuevo usuario de Kick:", user);
+            let nuevaSala = prompt("Nuevo ID de la sala de video:", room);
             if (nuevoUser && nuevaSala) {
                 window.location.href = `?user=${encodeURIComponent(nuevoUser)}&room=${encodeURIComponent(nuevaSala)}`;
             }
