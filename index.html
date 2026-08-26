@@ -61,14 +61,14 @@
         }
 
         .left-panel {
-            width: 28%;
+            width: 25%; /* Panel izquierdo un poco más compacto */
             background-color: #18181b;
             display: flex;
             flex-direction: column;
             border-right: 1px solid #2d2d30;
         }
         .stream-box {
-            height: 50%;
+            height: 45%;
             background: #000;
         }
         .info-box {
@@ -155,14 +155,14 @@
             document.getElementById("setup-modal").style.display = "none";
             document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Vista de espectadores totalmente limpia y expandida
-            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&autostart`;
+            // Vista de espectadores a pantalla completa limpia
+            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&scale=0&autostart`;
         }
 
         function activarEmision() {
             if(!room) return;
-            // Modo emisor optimizado: oculta controles innecesarios y estira el contenido para que cubra toda la pantalla central
-            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?push=${room}&clean&autostart&webcam`;
+            // Modo emisor con escala forzada a pantalla completa para eliminar el recuadro pequeño
+            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?push=${room}&clean&scale=0&autostart&webcam`;
         }
     </script>
 </body>
