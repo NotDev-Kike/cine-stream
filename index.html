@@ -112,7 +112,6 @@
         </div>
 
         <div class="center-panel">
-            <!-- Restauramos el permiso display-capture para que el navegador permita compartir la pantalla -->
             <iframe id="frame-pantalla" allow="display-capture; fullscreen"></iframe>
         </div>
     </div>
@@ -136,8 +135,9 @@
             document.getElementById("setup-modal").style.display = "none";
             document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Mantenemos la sala limpia, pero permitiendo que se comparta la pantalla sin pedir cámara ni micrófono general
-            document.getElementById("frame-pantalla").src = `https://meet.jit.si/${room}#config.startWithAudioMuted=true&config.startWithVideoMuted=true&config.prejoinPageEnabled=false`;
+            // Carga directa sin pantallas intermedias ni botones de unirse
+            let jitsiUrl = `https://meet.jit.si/${room}#config.startWithAudioMuted=true&config.startWithVideoMuted=true&config.prejoinPageEnabled=false&config.disableDeepLinking=true&userInfo.displayName="Streamer"`;
+            document.getElementById("frame-pantalla").src = jitsiUrl;
         }
     </script>
 </body>
