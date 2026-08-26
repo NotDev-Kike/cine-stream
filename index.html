@@ -135,8 +135,8 @@
             document.getElementById("setup-modal").style.display = "none";
             document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Carga directa sin pantallas intermedias ni botones de unirse
-            let jitsiUrl = `https://meet.jit.si/${room}#config.startWithAudioMuted=true&config.startWithVideoMuted=true&config.prejoinPageEnabled=false&config.disableDeepLinking=true&userInfo.displayName="Streamer"`;
+            // Configuración automática para entrar de forma anónima sin cuentas ni pantallas de registro
+            let jitsiUrl = `https://meet.jit.si/${room}#config.startWithAudioMuted=true&config.startWithVideoMuted=true&config.prejoinPageEnabled=false&config.disableDeepLinking=true&userInfo.displayName="Espectador"`;
             document.getElementById("frame-pantalla").src = jitsiUrl;
         }
     </script>
