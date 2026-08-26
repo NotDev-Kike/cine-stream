@@ -101,6 +101,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
 
         iframe { width: 100%; height: 100%; border: none; }
@@ -126,7 +127,8 @@
                 <p>Disfruta la película junto al streamer. El audio y la cámara provienen de su canal de Kick.</p>
                 <div>
                     <p style="color: #53fc18; margin-bottom: 5px; font-weight: bold;">¿Eres el Streamer?</p>
-                    <button class="btn-streamer" onclick="activarEmision()">Compartir Pantalla (Streamer)</button>
+                    <button class="btn-streamer" onclick="cambiarAModoEmisor()">Transmitir mi Pantalla Aquí</button>
+                    <button class="btn-streamer" style="background:#333; color:#fff; margin-top:5px;" onclick="cambiarAModoEspectador()">Ver como Espectador</button>
                 </div>
             </div>
         </div>
@@ -153,16 +155,22 @@
 
         if(user && room) {
             document.getElementById("setup-modal").style.display = "none";
-            document.getElementById("frame-stream", "").src = `https://player.kick.com/${user}?muted=false`;
+            document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Vista de espectadores
+            // Por defecto, al entrar carga el modo espectador limpio para que se vea la película al transmitir
             document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&scale=0&autostart`;
         }
 
-        function activarEmision() {
+        // Convierte el panel central en tu consola para elegir qué compartir sin tocar la cámara
+        function cambiarAModoEmisor() {
             if(!room) return;
-            // Quitamos 'webcam' y añadimos comandos limpios para que priorice compartir pantalla directamente sin pedir cámara
-            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?push=${room}&clean&screenshare&autostart`;
+            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?push=${room}&screenshare&autostart`;
+        }
+
+        // Regresa la pantalla central a la vista de la película ya transmitida
+        function cambiarAModoEspectador() {
+            if(!room) return;
+            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&scale=0&autostart`;
         }
     </script>
 </body>
