@@ -15,7 +15,6 @@
             overflow: hidden;
         }
 
-        /* Pantalla inicial rápida para que el espectador ponga el canal del streamer que quiere ver */
         #setup-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -61,7 +60,6 @@
             overflow: hidden;
         }
 
-        /* Panel Izquierdo: Stream de Kick (Audio y Cámara del Streamer) */
         .left-panel {
             width: 28%;
             background-color: #18181b;
@@ -81,7 +79,6 @@
             background: #0e0e10;
         }
 
-        /* Panel Central: Solo se ve la película que comparte el streamer */
         .center-panel {
             flex: 1;
             background-color: #000;
@@ -95,7 +92,6 @@
 </head>
 <body>
 
-    <!-- Ventana para indicar qué canal de Kick ver y qué sala de video sincronizar -->
     <div id="setup-modal">
         <div class="modal-box">
             <h2>Entrar al Stream</h2>
@@ -106,7 +102,6 @@
     </div>
 
     <div class="workspace">
-        <!-- Izquierda: Stream de Kick -->
         <div class="left-panel">
             <div class="stream-box">
                 <iframe id="frame-stream" allowfullscreen="true"></iframe>
@@ -116,8 +111,8 @@
             </div>
         </div>
 
-        <!-- Centro: Pantalla limpia de la película en tiempo real -->
         <div class="center-panel">
+            <!-- Restauramos el permiso display-capture para que el navegador permita compartir la pantalla -->
             <iframe id="frame-pantalla" allow="display-capture; fullscreen"></iframe>
         </div>
     </div>
@@ -139,10 +134,9 @@
 
         if(user && room) {
             document.getElementById("setup-modal").style.display = "none";
-            // Carga el stream del streamer
             document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Carga la película compartida limpia en modo espectador (sin pedir cámaras ni micros a los que entran)
+            // Mantenemos la sala limpia, pero permitiendo que se comparta la pantalla sin pedir cámara ni micrófono general
             document.getElementById("frame-pantalla").src = `https://meet.jit.si/${room}#config.startWithAudioMuted=true&config.startWithVideoMuted=true&config.prejoinPageEnabled=false`;
         }
     </script>
