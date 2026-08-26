@@ -77,7 +77,23 @@
             font-size: 13px;
             color: #777;
             background: #0e0e10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
+
+        .btn-streamer {
+            background: #53fc18;
+            color: black;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-streamer:hover { background: #45d613; }
 
         .center-panel {
             flex: 1;
@@ -97,7 +113,7 @@
             <h2>Entrar al Stream</h2>
             <input type="text" id="kick-user" placeholder="Usuario de Kick del streamer">
             <input type="text" id="room-id" placeholder="Nombre de la sala de la película">
-            <button onclick="entrar()">Ver Película</button>
+            <button onclick="entrar()">Entrar a la Sala</button>
         </div>
     </div>
 
@@ -107,7 +123,12 @@
                 <iframe id="frame-stream" allowfullscreen="true"></iframe>
             </div>
             <div class="info-box">
-                <p>Disfruta la película junto al streamer. El audio y la cámara provienen de su canal de Kick mientras proyecta la película en la pantalla principal.</p>
+                <p>Disfruta la película junto al streamer. El audio y la cámara provienen de su canal de Kick.</p>
+                <!-- Botón exclusivo para que el streamer comparta su pantalla directamente desde aquí -->
+                <div>
+                    <p style="color: #53fc18; margin-bottom: 5px; font-weight: bold;">¿Eres el Streamer?</p>
+                    <button class="btn-streamer" onclick="activarEmision()">Compartir Pantalla (Streamer)</button>
+                </div>
             </div>
         </div>
 
@@ -135,9 +156,15 @@
             document.getElementById("setup-modal").style.display = "none";
             document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Usamos VDO.Ninja como motor central: permite transmitir pantalla sin límite de tiempo y sin carteles de pago
-            let vdoUrl = `https://vdo.ninja/?view=${room}&transparent&autostart`;
-            document.getElementById("frame-pantalla").src = vdoUrl;
+            // Carga la pantalla en modo espectador por defecto
+            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&transparent&autostart`;
+        }
+
+        // Función que convierte tu misma pantalla central en tu emisor de video al hacer clic
+        function activarEmision() {
+            if(!room) return;
+            // Cambia el iframe central al modo de transmisión (push) para que elijas tu ventana de Stremio/Netflix ahí mismo
+            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?push=${room}&autostart&webcam`;
         }
     </script>
 </body>
