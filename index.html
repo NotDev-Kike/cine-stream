@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Party - Stream</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0e0e10;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background-color: #18181b;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #2d2d30;
+        }
+        header h1 { font-size: 18px; color: #00ff7f; }
+        .config-btn {
+            background: #53fc18;
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .left-panel {
+            width: 26%;
+            background-color: #1f1f23;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #2d2d30;
+        }
+        .stream-box { height: 40%; background: #000; }
+        .chat-info { flex: 1; padding: 15px; font-size: 14px; color: #adadb8; }
+        
+        .center-panel {
+            flex: 1;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            max-height: 100%;
+            outline: none;
+        }
+        .right-panel {
+            width: 22%;
+            background-color: #18181b;
+            border-left: 2px solid #2d2d30;
+        }
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 id="titulo-sala">Watch Party</h1>
+        <button class="config-btn" onclick="cambiarConfig()">Cambiar Canal / Video</button>
+    </header>
+
+    <div class="main-container">
+        <!-- Panel Izquierdo: Tu stream o cámara -->
+        <div class="left-panel">
+            <div class="stream-box">
+                <iframe id="frame-stream" allowfullscreen="true"></iframe>
+            </div>
+            <div class="chat-info">
+                <p>💡 <b>Instrucciones:</b> Recuerda abrir tu directo en Kick hablando con la gente, pero sin mostrar la película en la plataforma violeta/verde para evitar el copyright.</p>
+            </div>
+        </div>
+
+        <!-- Panel Central: La Película -->
+        <div class="center-panel">
+            <video id="reproductor-video" controls controlsList="nodownload">
+                Tu navegador no soporta la reproducción de video.
+            </video>
+        </div>
+
+        <!-- Panel Derecho: Chat de Kick -->
+        <div class="right-panel">
+            <iframe id="frame-chat" scrolling="no"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Obtener parámetros de la URL (Ejemplo: tuweb.com/?user=TuCanal&video= enlace_video)
+        const params = new URLSearchParams(window.location.search);
+        let user = params.get('user');
+        let videoUrl = params.get('video');
+
+        // Si no hay usuario configurado por defecto, pedirlo o usar uno de ejemplo
+        if (!user) {
+            user = prompt("Ingresa tu nombre de usuario de Kick:") || "tu_usuario";
+        }
+        if (!videoUrl) {
+            videoUrl = prompt("Ingresa el enlace directo al archivo de video (.mp4):") || "";
+        }
+
+        // Asignar elementos a la interfaz
+        document.getElementById("titulo-sala").innerText = "Transmitiendo con: " + user;
+        document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
+        document.getElementById("frame-chat").src = `https://kick.com/${user}/chatroom`;
+        
+        const videoElement = document.getElementById("reproductor-video");
+        const sourceElement = document.createElement("source");
+        sourceElement.src = videoUrl;
+        sourceElement.type = "video/mp4";
+        videoElement.appendChild(sourceElement);
+
+        // Función para cambiar de canal o video fácilmente
+        function cambiarConfig() {
+            let nuevoUser = prompt("Nuevo usuario de Kick:", user);
+            let nuevoVideo = prompt("Nuevo enlace directo de video (.mp4):", videoUrl);
+            if (nuevoUser && nuevoVideo) {
+                window.location.href = `?user=${encodeURIComponent(nuevoUser)}&video=${encodeURIComponent(nuevoVideo)}`;
+            }
+        }
+    </script>
+</body>
+</html>
