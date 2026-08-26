@@ -11,101 +11,85 @@
             color: #ffffff;
             font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* Contenedor principal de 3 columnas */
+        /* Ventana de configuración inicial genérica */
+        #setup-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-box {
+            background: #18181b;
+            padding: 30px;
+            border-radius: 8px;
+            width: 350px;
+            border: 1px solid #2d2d30;
+            text-align: center;
+        }
+        .modal-box h2 { color: #53fc18; margin-bottom: 15px; font-size: 20px; }
+        .modal-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            background: #0e0e10;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 4px;
+        }
+        .modal-box button {
+            background: #53fc18;
+            color: black;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Estructura Principal a 2 columnas */
         .workspace {
             display: flex;
-            flex: 1;
-            height: calc(100vh - 55px);
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
         }
 
-        /* 1. Panel Izquierdo (Cámara arriba + Chat de Kick abajo) */
+        /* 1. Panel Izquierdo: Tu stream de Kick (Cámara y Audio) */
         .left-panel {
-            width: 24%;
+            width: 28%;
             background-color: #18181b;
             display: flex;
             flex-direction: column;
             border-right: 1px solid #2d2d30;
         }
-        .cam-box {
-            height: 35%;
+        .stream-box {
+            height: 50%;
             background: #000;
         }
-        .chat-overlay-box {
+        .info-box {
             flex: 1;
-            position: relative;
+            padding: 20px;
+            font-size: 14px;
+            color: #888;
             background: #0e0e10;
+            line-height: 1.5;
         }
 
-        /* 2. Panel Central (Título de la película + Pantalla compartida grande) */
+        /* 2. Panel Central: Pantalla gigante para ver la película o app compartida */
         .center-panel {
             flex: 1;
             background-color: #000;
             display: flex;
-            flex-direction: column;
-        }
-        .movie-title-bar {
-            height: 45px;
-            background-color: #0e0e10;
-            display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            color: #a991f7;
-            border-bottom: 1px solid #1f1f23;
-        }
-        .movie-screen {
-            flex: 1;
-            background: #000;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* 3. Panel Derecho (Chat completo de Kick) */
-        .right-panel {
-            width: 20%;
-            background-color: #18181b;
-            border-left: 1px solid #2d2d30;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Barra Inferior (Botones de Suscripción) */
-        footer {
-            height: 55px;
-            background-color: #000000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            border-top: 1px solid #222;
-        }
-        .btn-twitch {
-            background-color: #9146ff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .btn-kick {
-            background-color: #53fc18;
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
         }
 
         iframe { width: 100%; height: 100%; border: none; }
@@ -113,55 +97,58 @@
 </head>
 <body>
 
-    <div class="workspace">
-        <!-- 1. Izquierda: Tu cámara arriba y chat de Kick abajo -->
-        <div class="left-panel">
-            <div class="cam-box">
-                <iframe id="frame-stream" allowfullscreen="true"></iframe>
-            </div>
-            <div class="chat-overlay-box">
-                <iframe id="frame-chat-left" scrolling="no"></iframe>
-            </div>
-        </div>
-
-        <!-- 2. Centro: Título de la película y la pantalla compartida (Stremio/Netflix) -->
-        <div class="center-panel">
-            <div class="movie-title-bar" id="titulo-pelicula">
-                SPAIDY - NO WRY HOME
-            </div>
-            <div class="movie-screen">
-                <iframe id="frame-pantalla" allow="camera; microphone; display-capture; fullscreen"></iframe>
-            </div>
-        </div>
-
-        <!-- 3. Derecha: Chat principal de Kick completo -->
-        <div class="right-panel">
-            <iframe id="frame-chat-right" scrolling="no"></iframe>
+    <!-- MODAL DE CONFIGURACIÓN AUTOMÁTICA -->
+    <div id="setup-modal">
+        <div class="modal-box">
+            <h2>Configurar Watch Party</h2>
+            <input type="text" id="kick-user" placeholder="Tu usuario de Kick (ej: tu_canal)">
+            <input type="text" id="room-id" placeholder="Nombre de sala (ej: mipeliprivada)">
+            <button onclick="entrarSala()">Iniciar Sala</button>
         </div>
     </div>
 
-    <!-- Barra inferior con botones de suscripción -->
-    <footer>
-        <button class="btn-twitch" onclick="alert('Enlace de suscripción a Twitch')">Suscribirse en Twitch</button>
-        <button class="btn-kick" onclick="alert('Enlace de suscripción a Kick')">Suscribirse en Kick</button>
-    </footer>
+    <!-- PANTALLA PRINCIPAL -->
+    <div class="workspace">
+        <!-- Izquierda: Stream de Kick -->
+        <div class="left-panel">
+            <div class="stream-box">
+                <iframe id="frame-stream" allowfullscreen="true"></iframe>
+            </div>
+            <div class="info-box">
+                <p>💡 <b>Cómo usar:</b></p><br>
+                <p>1. Aquí te escuchan y ven por tu directo de Kick.</p><br>
+                <p>2. En la pantalla de la derecha, comparte la ventana de <b>Stremio, Netflix</b> o tu PC para ver la película con tu gente sin riesgos de copyright.</p>
+            </div>
+        </div>
+
+        <!-- Centro: Pantalla compartida en tiempo real -->
+        <div class="center-panel">
+            <iframe id="frame-pantalla" allow="camera; microphone; display-capture; fullscreen"></iframe>
+        </div>
+    </div>
 
     <script>
-        // Configuración automática por parámetros de la URL
-        // Ejemplo de uso: tudominio.com/?user=TuCanal&room=sala123&movie=SPAIDY+-+NO+WAY+HOME
-        const params = new URLSearchParams(window.location.search);
-        let user = params.get('user') || prompt("Ingresa tu usuario de Kick:") || "tu_usuario";
-        let room = params.get('room') || prompt("Ingresa el ID de la sala de video en vivo:") || "sala-default";
-        let movieName = params.get('movie') || "SPAIDY - NO WAY HOME";
+        function entrarSala() {
+            let user = document.getElementById("kick-user").value.trim();
+            let room = document.getElementById("room-id").value.trim();
+            if(!user || !room) {
+                alert("Por favor rellena ambos campos.");
+                return;
+            }
+            window.location.href = `?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}`;
+        }
 
-        // Asignación de elementos
-        document.getElementById("titulo-pelicula").innerText = movieName;
-        document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
-        document.getElementById("frame-chat-left").src = `https://kick.com/${user}/chatroom`;
-        document.getElementById("frame-chat-right").src = `https://kick.com/${user}/chatroom`;
-        
-        // Pantalla central compartida (aquí compartes Stremio o Netflix)
-        document.getElementById("frame-pantalla").src = `https://meet.jit.si/${room}#config.startWithAudioMuted=true&config.startWithVideoMuted=true&interfaceConfig.TOOLBAR_BUTTONS=['microphone','camera','desktop','fullscreen']`;
+        // Cargar datos si ya están en la URL
+        const params = new URLSearchParams(window.location.search);
+        let user = params.get('user');
+        let room = params.get('room');
+
+        if(user && room) {
+            document.getElementById("setup-modal").style.display = "none";
+            document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
+            // Pantalla central interactiva para compartir Stremio, Netflix o tu pantalla
+            document.getElementById("frame-pantalla").src = `https://meet.jit.si/${room}#config.startWithAudioMuted=true&config.startWithVideoMuted=true`;
+        }
     </script>
 </body>
 </html>
