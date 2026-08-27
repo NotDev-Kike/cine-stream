@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Watch Party</title>
+    <title>Watch Party - Stream & Película</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -15,6 +15,7 @@
             overflow: hidden;
         }
 
+        /* Pantalla de configuración inicial */
         #setup-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -60,22 +61,23 @@
             overflow: hidden;
         }
 
+        /* Panel izquierdo para el streamer (controles) */
         .left-panel {
-            width: 25%;
+            width: 28%;
             background-color: #18181b;
             display: flex;
             flex-direction: column;
             border-right: 1px solid #2d2d30;
         }
         .stream-box {
-            height: 45%;
+            height: 40%;
             background: #000;
         }
         .info-box {
             flex: 1;
             padding: 20px;
             font-size: 13px;
-            color: #777;
+            color: #aaa;
             background: #0e0e10;
             display: flex;
             flex-direction: column;
@@ -96,57 +98,99 @@
         .btn-streamer:hover { background: #45d613; }
 
         .link-box {
-            background: #0e0e10;
+            background: #18181b;
             border: 1px solid #333;
             padding: 8px;
             border-radius: 4px;
-            margin-top: 10px;
+            margin-top: 6px;
             font-size: 11px;
             word-break: break-all;
             color: #53fc18;
         }
 
+        /* Panel derecho principal (La película en grande) */
         .center-panel {
             flex: 1;
             background-color: #000;
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         iframe { width: 100%; height: 100%; border: none; }
+
+        /* Widget flotante de promoción del streamer para los viewers */
+        .promo-overlay {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 280px;
+            height: 160px;
+            background: #18181b;
+            border: 2px solid #53fc18;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+        .promo-header {
+            background: #2d2d30;
+            color: #53fc18;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 4px 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .promo-header a { color: #00d2ff; text-decoration: none; }
     </style>
 </head>
 <body>
 
+    <!-- Ventana de inicio para introducir tus datos -->
     <div id="setup-modal">
         <div class="modal-box">
             <h2>Configurar Watch Party</h2>
-            <input type="text" id="kick-user" placeholder="Tu usuario de Kick">
-            <input type="text" id="room-id" placeholder="Sala (ej. peliluis)">
-            <button onclick="entrar()">Crear mi Enlace / Entrar</button>
+            <input type="text" id="kick-user" placeholder="Tu usuario de Kick (ej. tu_usuario)">
+            <input type="text" id="room-id" placeholder="Nombre de sala (ej. peliluis)">
+            <button onclick="entrar()">Iniciar Panel</button>
         </div>
     </div>
 
     <div class="workspace">
+        <!-- Panel de control privado del Streamer -->
         <div class="left-panel">
             <div class="stream-box">
                 <iframe id="frame-stream" allowfullscreen="true"></iframe>
             </div>
             <div class="info-box">
-                <p>Chat y directo de Kick arriba. Panel de Streamer:</p>
                 <div>
-                    <button class="btn-streamer" onclick="modoCompartir()">Compartir Pantalla</button>
+                    <p style="color:#fff; font-weight:bold; margin-bottom:5px;">Controles:</p>
+                    <button class="btn-streamer" onclick="modoCompartir()">Compartir Pantalla (Película)</button>
                     
-                    <p style="color: #fff; margin-top: 15px; margin-bottom: 3px; font-weight: bold; font-size:11px;">Enlace para tus Viewers (Solo Ver):</p>
+                    <p style="color: #fff; margin-top: 15px; margin-bottom: 3px; font-weight: bold; font-size:11px;">Enlace para tus Viewers:</p>
                     <button class="btn-streamer" style="background:#ff9900; margin-top:0;" onclick="copiarLinkViewer()">Copiar Link para el Chat</button>
                     <div id="viewer-link-display" class="link-box">Generando...</div>
                 </div>
+                <p style="font-size:11px; color:#666;">Los viewers verán la peli en grande y tu stream flotando para promocionarte.</p>
             </div>
         </div>
 
+        <!-- Pantalla gigante donde se proyecta la película de VDO.Ninja -->
         <div class="center-panel">
             <iframe id="frame-pantalla" allow="display-capture; fullscreen; autoplay"></iframe>
+
+            <!-- Ventana flotante integrada para que el viewer vea tu canal de Kick con alta calidad -->
+            <div class="promo-overlay" id="promo-container" style="display:none;">
+                <div class="promo-header">
+                    <span>EN VIVO EN KICK</span>
+                    <a id="promo-link" href="#" target="_blank">Canal ↗</a>
+                </div>
+                <iframe id="frame-promo-kick" allowfullscreen="true"></iframe>
+            </div>
         </div>
     </div>
 
@@ -157,7 +201,7 @@
             room = room.toLowerCase().replace(/[^a-z0-9]/g, '_');
             
             if(!user || !room) {
-                alert("Llena los datos.");
+                alert("Llena los datos correctamente.");
                 return;
             }
             window.location.href = `?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}`;
@@ -170,14 +214,33 @@
 
         if(user && room) {
             document.getElementById("setup-modal").style.display = "none";
+            
+            // Carga tu stream en tu panel de control izquierdo
             document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Genera el link directo exclusivo para espectadores
-            viewerLink = `https://vdo.ninja/?view=${room}&clean&scale=0&autoplay`;
+            // Genera el link inteligente para el chat que incluye tanto la vista de VDO.Ninja como tu usuario para la promoción
+            // Este enlace apunta directamente a tu propia web desplegada en GitHub Pages pasando ambos parámetros
+            let currentUrl = window.location.origin + window.location.pathname;
+            viewerLink = `${currentUrl}?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}&viewer=true`;
             document.getElementById("viewer-link-display").innerText = viewerLink;
             
-            // Inicia directamente en la consola de emisor para que puedas compartir tu pantalla al entrar
-            modoCompartir();
+            // Verificamos si quien abrió la página es un viewer o el streamer
+            if(params.get('viewer') === 'true') {
+                // Modo Espectador Puro: Oculta el panel izquierdo y deja la peli en pantalla completa con tu stream flotando
+                document.querySelector(".left-panel").style.display = "none";
+                
+                // Carga la película limpia de VDO.Ninja a máxima calidad
+                let iframePantalla = document.getElementById("frame-pantalla");
+                iframePantalla.src = `https://vdo.ninja/?view=${room}&clean&scale=0&autoplay&quality=0`;
+                
+                // Muestra el cuadro flotante con tu stream de Kick en alta calidad
+                document.getElementById("promo-container").style.display = "flex";
+                document.getElementById("frame-promo-kick").src = `https://player.kick.com/${user}?muted=false`;
+                document.getElementById("promo-link").href = `https://kick.com/${user}`;
+            } else {
+                // Modo Streamer: Inicia preparando la pantalla para compartir
+                modoCompartir();
+            }
         }
 
         function modoCompartir() {
@@ -190,7 +253,7 @@
         function copiarLinkViewer() {
             if(!viewerLink) return;
             navigator.clipboard.writeText(viewerLink).then(() => {
-                alert("¡Enlace de solo vista copiado! Pégalo en tu chat de Kick.");
+                alert("¡Enlace de Watch Party copiado! Pégalo en tu chat de Kick. Tus viewers verán la peli y tu stream flotando.");
             });
         }
     </script>
