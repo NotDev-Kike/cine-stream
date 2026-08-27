@@ -28,7 +28,7 @@
             background: #18181b;
             padding: 30px;
             border-radius: 8px;
-            width: 350px;
+            width: 380px;
             border: 1px solid #2d2d30;
             text-align: center;
         }
@@ -91,7 +91,7 @@
             width: 100%;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         .btn-streamer:hover { background: #45d613; }
 
@@ -101,7 +101,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
         }
 
         iframe { width: 100%; height: 100%; border: none; }
@@ -111,10 +110,10 @@
 
     <div id="setup-modal">
         <div class="modal-box">
-            <h2>Entrar al Stream</h2>
-            <input type="text" id="kick-user" placeholder="Usuario de Kick del streamer">
-            <input type="text" id="room-id" placeholder="Nombre de la sala de la película">
-            <button onclick="entrar()">Entrar a la Sala</button>
+            <h2>Configurar Watch Party</h2>
+            <input type="text" id="kick-user" placeholder="Tu usuario de Kick">
+            <input type="text" id="room-id" placeholder="Nombre de la sala (ej. peliluis)">
+            <button onclick="entrar()">Crear mi Enlace / Entrar</button>
         </div>
     </div>
 
@@ -124,17 +123,17 @@
                 <iframe id="frame-stream" allowfullscreen="true"></iframe>
             </div>
             <div class="info-box">
-                <p>Disfruta la película junto al streamer. El audio y la cámara provienen de su canal de Kick.</p>
+                <p>Chat y directo de Kick arriba. Si eres el streamer, usa estos botones para iniciar tu película:</p>
                 <div>
-                    <p style="color: #53fc18; margin-bottom: 5px; font-weight: bold;">¿Eres el Streamer?</p>
-                    <button class="btn-streamer" onclick="cambiarAModoEmisor()">Transmitir mi Pantalla Aquí</button>
-                    <button class="btn-streamer" style="background:#333; color:#fff; margin-top:5px;" onclick="cambiarAModoEspectador()">Ver como Espectador</button>
+                    <p style="color: #53fc18; margin-bottom: 5px; font-weight: bold; font-size:12px;">Panel de Control Streamer:</p>
+                    <button class="btn-streamer" onclick="activarEmision()">1. Compartir Pantalla</button>
+                    <button class="btn-streamer" style="background:#00d2ff;" onclick="verPelicula()">2. Ver Película en Vivo</button>
                 </div>
             </div>
         </div>
 
         <div class="center-panel">
-            <iframe id="frame-pantalla" allow="display-capture; fullscreen; camera; microphone"></iframe>
+            <iframe id="frame-pantalla" allow="display-capture; fullscreen; autoplay"></iframe>
         </div>
     </div>
 
@@ -157,18 +156,16 @@
             document.getElementById("setup-modal").style.display = "none";
             document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Por defecto, al entrar carga el modo espectador limpio para que se vea la película al transmitir
+            // Tus viewers entran directo a ver la peli limpia gracias al parámetro 'view'
             document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&scale=0&autostart`;
         }
 
-        // Convierte el panel central en tu consola para elegir qué compartir sin tocar la cámara
-        function cambiarAModoEmisor() {
+        function activarEmision() {
             if(!room) return;
-            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?push=${room}&screenshare&autostart`;
+            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?push=${room}&screenshare&autostart&quality=0`;
         }
 
-        // Regresa la pantalla central a la vista de la película ya transmitida
-        function cambiarAModoEspectador() {
+        function verPelicula() {
             if(!room) return;
             document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&scale=0&autostart`;
         }
