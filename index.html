@@ -112,7 +112,7 @@
         <div class="modal-box">
             <h2>Configurar Watch Party</h2>
             <input type="text" id="kick-user" placeholder="Tu usuario de Kick">
-            <input type="text" id="room-id" placeholder="Nombre de la sala (ej. peliluis)">
+            <input type="text" id="room-id" placeholder="Sala (ej. peliluis)">
             <button onclick="entrar()">Crear mi Enlace / Entrar</button>
         </div>
     </div>
@@ -123,11 +123,11 @@
                 <iframe id="frame-stream" allowfullscreen="true"></iframe>
             </div>
             <div class="info-box">
-                <p>Chat y directo de Kick arriba. Si eres el streamer, usa estos botones para iniciar tu película:</p>
+                <p>Chat y directo de Kick arriba. Controles:</p>
                 <div>
-                    <p style="color: #53fc18; margin-bottom: 5px; font-weight: bold; font-size:12px;">Panel de Control Streamer:</p>
-                    <button class="btn-streamer" onclick="activarEmision()">1. Compartir Pantalla</button>
-                    <button class="btn-streamer" style="background:#00d2ff;" onclick="verPelicula()">2. Ver Película en Vivo</button>
+                    <p style="color: #53fc18; margin-bottom: 5px; font-weight: bold; font-size:12px;">Panel:</p>
+                    <button class="btn-streamer" onclick="modoCompartir()">1. Compartir Pantalla</button>
+                    <button class="btn-streamer" style="background:#00d2ff;" onclick="modoVer()">2. Ver Película / Recargar</button>
                 </div>
             </div>
         </div>
@@ -141,6 +141,8 @@
         function entrar() {
             let user = document.getElementById("kick-user").value.trim();
             let room = document.getElementById("room-id").value.trim();
+            room = room.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            
             if(!user || !room) {
                 alert("Llena los datos.");
                 return;
@@ -156,18 +158,19 @@
             document.getElementById("setup-modal").style.display = "none";
             document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Tus viewers entran directo a ver la peli limpia gracias al parámetro 'view'
-            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&scale=0&autostart`;
+            // Carga inicial del visor con parámetros mejorados para forzar el autoplay y la limpieza
+            modoVer();
         }
 
-        function activarEmision() {
+        function modoCompartir() {
             if(!room) return;
             document.getElementById("frame-pantalla").src = `https://vdo.ninja/?push=${room}&screenshare&autostart&quality=0`;
         }
 
-        function verPelicula() {
+        function modoVer() {
             if(!room) return;
-            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&scale=0&autostart`;
+            // Se añaden parámetros avanzados de VDO.ninja para asegurar que reconozca el stream al vuelo
+            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&scale=0&autostart&autoplay&lq`;
         }
     </script>
 </body>
