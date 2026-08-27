@@ -108,7 +108,7 @@
             color: #53fc18;
         }
 
-        /* Panel derecho principal (La película en grande) */
+        /* Panel principal (La película en grande) */
         .center-panel {
             flex: 1;
             background-color: #000;
@@ -120,18 +120,18 @@
 
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* Widget flotante de promoción del streamer para los viewers */
+        /* Widget flotante de promoción arriba a la derecha, más visible y grande */
         .promo-overlay {
             position: absolute;
-            bottom: 20px;
+            top: 20px;
             right: 20px;
-            width: 280px;
-            height: 160px;
+            width: 340px;
+            height: 200px;
             background: #18181b;
             border: 2px solid #53fc18;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.9);
             z-index: 10;
             display: flex;
             flex-direction: column;
@@ -139,11 +139,12 @@
         .promo-header {
             background: #2d2d30;
             color: #53fc18;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
-            padding: 4px 8px;
+            padding: 6px 10px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
         .promo-header a { color: #00d2ff; text-decoration: none; }
     </style>
@@ -175,7 +176,7 @@
                     <button class="btn-streamer" style="background:#ff9900; margin-top:0;" onclick="copiarLinkViewer()">Copiar Link para el Chat</button>
                     <div id="viewer-link-display" class="link-box">Generando...</div>
                 </div>
-                <p style="font-size:11px; color:#666;">Los viewers verán la peli en grande y tu stream flotando para promocionarte.</p>
+                <p style="font-size:11px; color:#666;">Los viewers verán la peli y tu stream flotando arriba a la derecha.</p>
             </div>
         </div>
 
@@ -183,10 +184,10 @@
         <div class="center-panel">
             <iframe id="frame-pantalla" allow="display-capture; fullscreen; autoplay"></iframe>
 
-            <!-- Ventana flotante integrada para que el viewer vea tu canal de Kick con alta calidad -->
+            <!-- Ventana flotante arriba a la derecha mejorada y más visible -->
             <div class="promo-overlay" id="promo-container" style="display:none;">
                 <div class="promo-header">
-                    <span>EN VIVO EN KICK</span>
+                    <span>🔴 EN VIVO EN KICK</span>
                     <a id="promo-link" href="#" target="_blank">Canal ↗</a>
                 </div>
                 <iframe id="frame-promo-kick" allowfullscreen="true"></iframe>
@@ -218,22 +219,21 @@
             // Carga tu stream en tu panel de control izquierdo
             document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Genera el link inteligente para el chat que incluye tanto la vista de VDO.Ninja como tu usuario para la promoción
-            // Este enlace apunta directamente a tu propia web desplegada en GitHub Pages pasando ambos parámetros
+            // Genera el link inteligente para el chat
             let currentUrl = window.location.origin + window.location.pathname;
             viewerLink = `${currentUrl}?user=${encodeURIComponent(user)}&room=${encodeURIComponent(room)}&viewer=true`;
             document.getElementById("viewer-link-display").innerText = viewerLink;
             
             // Verificamos si quien abrió la página es un viewer o el streamer
             if(params.get('viewer') === 'true') {
-                // Modo Espectador Puro: Oculta el panel izquierdo y deja la peli en pantalla completa con tu stream flotando
+                // Modo Espectador Puro: Oculta el panel izquierdo y deja la peli en grande con tu stream arriba a la derecha
                 document.querySelector(".left-panel").style.display = "none";
                 
                 // Carga la película limpia de VDO.Ninja a máxima calidad
                 let iframePantalla = document.getElementById("frame-pantalla");
                 iframePantalla.src = `https://vdo.ninja/?view=${room}&clean&scale=0&autoplay&quality=0`;
                 
-                // Muestra el cuadro flotante con tu stream de Kick en alta calidad
+                // Muestra el cuadro flotante arriba a la derecha con mayor tamaño
                 document.getElementById("promo-container").style.display = "flex";
                 document.getElementById("frame-promo-kick").src = `https://player.kick.com/${user}?muted=false`;
                 document.getElementById("promo-link").href = `https://kick.com/${user}`;
@@ -253,7 +253,7 @@
         function copiarLinkViewer() {
             if(!viewerLink) return;
             navigator.clipboard.writeText(viewerLink).then(() => {
-                alert("¡Enlace de Watch Party copiado! Pégalo en tu chat de Kick. Tus viewers verán la peli y tu stream flotando.");
+                alert("¡Enlace de Watch Party copiado! Pégalo en tu chat de Kick.");
             });
         }
     </script>
