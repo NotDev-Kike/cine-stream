@@ -123,17 +123,18 @@
                 <iframe id="frame-stream" allowfullscreen="true"></iframe>
             </div>
             <div class="info-box">
-                <p>Chat y directo de Kick arriba. Controles:</p>
+                <p>Chat y directo de Kick arriba. Controles privados de streamer:</p>
                 <div>
                     <p style="color: #53fc18; margin-bottom: 5px; font-weight: bold; font-size:12px;">Panel:</p>
-                    <button class="btn-streamer" onclick="modoCompartir()">1. Compartir Pantalla</button>
+                    <button class="btn-streamer" onclick="modoCompartir()">1. Modo Emisor</button>
                     <button class="btn-streamer" style="background:#00d2ff;" onclick="modoVer()">2. Ver Película / Recargar</button>
                 </div>
             </div>
         </div>
 
         <div class="center-panel">
-            <iframe id="frame-pantalla" allow="display-capture; fullscreen; autoplay"></iframe>
+            <!-- Bloqueamos permisos de cámara/micrófono/captura en el iframe central por defecto -->
+            <iframe id="frame-pantalla" allow="fullscreen; autoplay"></iframe>
         </div>
     </div>
 
@@ -156,21 +157,24 @@
 
         if(user && room) {
             document.getElementById("setup-modal").style.display = "none";
-            document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
+            document.getElementById("frame-stream",).src = `https://player.kick.com/${user}?muted=false`;
             
-            // Carga inicial del visor con parámetros mejorados para forzar el autoplay y la limpieza
+            // Tus viewers entran directo a este modo (visor puro, sin opción de transmitir)
             modoVer();
         }
 
         function modoCompartir() {
             if(!room) return;
-            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?push=${room}&screenshare&autostart&quality=0`;
+            // Solo cuando tú le das clic a tu botón de emisor, habilitamos temporalmente el permiso de pantalla
+            let iframe = document.getElementById("frame-pantalla");
+            iframe.setAttribute("allow", "display-capture; fullscreen; autoplay");
+            iframe.src = `https://vdo.ninja/?push=${room}&screenshare&autostart&quality=0`;
         }
 
         function modoVer() {
             if(!room) return;
-            // Se añaden parámetros avanzados de VDO.ninja para asegurar que reconozca el stream al vuelo
-            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&scale=0&autostart&autoplay&lq`;
+            // El modo visor estricto: sin controles, sin menús y sin posibilidad de hacer push
+            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?viewer=${room}&clean&scale=0&autostart&autoplay&lq`;
         }
     </script>
 </body>
