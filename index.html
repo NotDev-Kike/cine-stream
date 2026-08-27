@@ -134,13 +134,11 @@
                 <iframe id="frame-stream" allowfullscreen="true"></iframe>
             </div>
             <div class="info-box">
-                <p>Chat y directo de Kick arriba. Tus controles de emisor:</p>
+                <p>Chat y directo de Kick arriba. Panel de Streamer:</p>
                 <div>
-                    <p style="color: #53fc18; margin-bottom: 5px; font-weight: bold; font-size:12px;">Panel:</p>
-                    <button class="btn-streamer" onclick="modoCompartir()">1. Compartir Pantalla</button>
-                    <button class="btn-streamer" style="background:#00d2ff;" onclick="modoVer()">2. Ver Película en Vivo</button>
+                    <button class="btn-streamer" onclick="modoCompartir()">Compartir Pantalla</button>
                     
-                    <p style="color: #fff; margin-top: 12px; margin-bottom: 3px; font-weight: bold; font-size:11px;">Enlace para tus Viewers (Solo Ver):</p>
+                    <p style="color: #fff; margin-top: 15px; margin-bottom: 3px; font-weight: bold; font-size:11px;">Enlace para tus Viewers (Solo Ver):</p>
                     <button class="btn-streamer" style="background:#ff9900; margin-top:0;" onclick="copiarLinkViewer()">Copiar Link para el Chat</button>
                     <div id="viewer-link-display" class="link-box">Generando...</div>
                 </div>
@@ -148,7 +146,7 @@
         </div>
 
         <div class="center-panel">
-            <iframe id="frame-pantalla" allow="fullscreen; autoplay"></iframe>
+            <iframe id="frame-pantalla" allow="display-capture; fullscreen; autoplay"></iframe>
         </div>
     </div>
 
@@ -174,11 +172,12 @@
             document.getElementById("setup-modal").style.display = "none";
             document.getElementById("frame-stream").src = `https://player.kick.com/${user}?muted=false`;
             
-            // Construye el enlace exacto y limpio de solo vista para tus viewers (usando VDO.Ninja directo con view)
+            // Genera el link directo exclusivo para espectadores
             viewerLink = `https://vdo.ninja/?view=${room}&clean&scale=0&autoplay`;
             document.getElementById("viewer-link-display").innerText = viewerLink;
             
-            modoVer();
+            // Inicia directamente en la consola de emisor para que puedas compartir tu pantalla al entrar
+            modoCompartir();
         }
 
         function modoCompartir() {
@@ -188,15 +187,10 @@
             iframe.src = `https://vdo.ninja/?push=${room}&screenshare&autostart&quality=0`;
         }
 
-        function modoVer() {
-            if(!room) return;
-            document.getElementById("frame-pantalla").src = `https://vdo.ninja/?view=${room}&clean&scale=0&autostart&autoplay&lq`;
-        }
-
         function copiarLinkViewer() {
             if(!viewerLink) return;
             navigator.clipboard.writeText(viewerLink).then(() => {
-                alert("¡Enlace de solo vista copiado al portapapeles! Pégalo en tu chat de Kick.");
+                alert("¡Enlace de solo vista copiado! Pégalo en tu chat de Kick.");
             });
         }
     </script>
